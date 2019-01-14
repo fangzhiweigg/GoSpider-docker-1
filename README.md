@@ -48,51 +48,43 @@ chomd 777 build.sh
 
 启动后即可从外部使用。
 
-mysql外部端口8003，账号密码:root/459527502
+mysql外部端口`3306`，账号密码:`root/123456789`
 
-redis外部端口8002，密码:GoSpider
+redis外部端口`6379`，密码:`123456789`
 
-因为容器挂卷，在内部或外部修改代码，都会同步
 
 如果本机没有安装`mysql`和`redis`客户端，可执行
 
 ```
-docker exec -it GoSpider-redis redis-cli -a GoSpider
-docker exec -it  GoSpider-mysqldb mysql -uroot -p459527502
+docker exec -it GoSpider-redis redis-cli -a 123456789
+docker exec -it  GoSpider-mysqldb mysql -uroot -p123456789
 
 mysql> show variables like '%max_connect%';
 ```
 
-进入golang，我建议本地安装，或者你可以通过docker这样安装：
-
-命令如下:
-
-```
-docker pull golang:1.8
-docker run --rm --net=host -it -v $HOME/mydocker/go:/go --name mygolang golang:1.8 /bin/bash
-```
 
 # 三. 原理
+
 `build.sh`内容如下：
 
 ```
 #!/bin/bash
-#sudo rm -rf $HOME/mydocker
-sudo mkdir -p $HOME/mydocker/redis/data
-sudo mkdir -p $HOME/mydocker/redis/conf
-sudo mkdir -p $HOME/mydocker/mysql/data
-sudo mkdir -p $HOME/mydocker/mysql/conf
-sudo mkdir -p $HOME/mydocker/go
-sudo cp my.cnf $HOME/mydocker/mysql/conf/my.cnf
-sudo cp redis.conf $HOME/mydocker/redis/conf/redis.conf
+#sudo rm -rf /data/mydocker
+sudo mkdir -p /data/mydocker/redis/data
+sudo mkdir -p /data/mydocker/redis/conf
+sudo mkdir -p /data/mydocker/mysql/data
+sudo mkdir -p /data/mydocker/mysql/conf
+sudo mkdir -p /data/mydocker/go
+sudo cp my.cnf /data/mydocker/mysql/conf/my.cnf
+sudo cp redis.conf /data/mydocker/redis/conf/redis.conf
 sudo docker-compose stop
 sudo docker-compose rm -f
 sudo docker-compose up -d
 ```
 
-原理是先将`mysql`和redis`的配置文件移动到根目录下的某个地方，再挂载进容器，数据库数据会保存在本地，即使容器死掉也可重启不丢。
+原理是先将`mysql`和`redis`的配置文件移动到根目录下的某个地方，再挂载进容器，数据库数据会保存在本地，即使容器死掉也可重启不丢。
 
-配置文件中`mysql`连接数已经设置高，`redis`设置了密码:`requirepass GoSpider`
+配置文件中`mysql`连接数已经设置高，`redis`设置了密码:`requirepass 123456789`
 
 
 `docker-compose.yaml`内容如下：
@@ -106,8 +98,8 @@ services:
       ports: 
         - "6379:6379"
       volumes:
-        - $HOME/mydocker/redis/data:/data
-        - $HOME/mydocker/redis/conf:/usr/local/etc/redis
+        - /data/mydocker/redis/data:/data
+        - /data/mydocker/redis/conf:/usr/local/etc/redis
       command: redis-server /usr/local/etc/redis/redis.conf
     mysqldb: 
       container_name: "GoSpider-mysqldb"
@@ -115,11 +107,11 @@ services:
       ports: 
         - "3306:3306"
       environment: 
-        - MYSQL_ROOT_PASSWORD=459527502
+        - MYSQL_ROOT_PASSWORD=123456789
       volumes:
-        - $HOME/mydocker/mysql/data:/var/lib/mysql
-        - $HOME/mydocker/mysql/conf:/etc/mysql/conf.d
+        - /data/mydocker/mysql/data:/var/lib/mysql
+        - /data/mydocker/mysql/conf:/etc/mysql/conf.d
 ```
 
-可适当改端口
+可适当改端口.
 
