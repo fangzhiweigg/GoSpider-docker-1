@@ -12,14 +12,6 @@
 
 然后安装好`git`，`docker`和`docker-compose`
 
-请参考：
-
-Dokcer安装：[http://www.lenggirl.com/tool/docker-ubuntu-install.html](http://www.lenggirl.com/tool/docker-ubuntu-install.html)
-
-国内的推荐这样安装：[http://www.lenggirl.com/tool/docker-install.html](http://www.lenggirl.com/tool/docker-install.html)
-
-Docker-compose安装：[http://www.lenggirl.com/tool/docker-compose.html](http://www.lenggirl.com/tool/docker-compose.html)
-
 我已经写好脚本安装docker了，请直接运行
 
 ```
